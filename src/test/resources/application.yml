@@ -1,3 +1,5 @@
+#스프링 부트는 datasource 설정이 없으면, 기본적을 메모리 DB를 사용하고, driver-class도 현재 등록된 라이브러를 보고 찾아준다.
+
 spring:
 #  datasource:
 #    url: jdbc:h2:mem:test
