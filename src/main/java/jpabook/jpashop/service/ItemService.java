@@ -27,4 +27,16 @@ public class ItemService {
     public Item findOne(Long itemId) {
         return itemRepository.findOne(itemId);
     }
+
+    /**
+     * 영속성 컨텍스트가 자동 변경
+     * @Transactional 애노테이션과 JPA 영속성 컨텍스트 변경 감지(itemRepository.findOne(id)를 통해 변경 건에 대한 업데이트가 자동으로 이뤄짐.
+     */
+    @Transactional
+    public void updateItem(Long id, String name, int price, int stockQuantity) {
+        Item item = itemRepository.findOne(id);
+        item.setName(name);
+        item.setPrice(price);
+        item.setStockQuantity(stockQuantity);
+    }
 }
