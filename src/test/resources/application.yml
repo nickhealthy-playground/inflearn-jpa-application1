@@ -1,19 +1,20 @@
 #스프링 부트는 datasource 설정이 없으면, 기본적을 메모리 DB를 사용하고, driver-class도 현재 등록된 라이브러를 보고 찾아준다.
 
 spring:
-#  datasource:
+  datasource:
 #    url: jdbc:h2:mem:test
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
-#
-#  jpa:
-#    hibernate:
-#      ddl-auto: create  # 애플리케이션 실행 시점에 테이블을 DROP 후 재생성
-#    properties:
-#      hibernate:
-#        format_sql: true
-##        show_sql: true # System.out에 하이버네이트 실행 SQL문 출력
+    url: jdbc:h2:tcp://localhost/~/jpashop
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create  # 애플리케이션 실행 시점에 테이블을 DROP 후 재생성
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true # System.out에 하이버네이트 실행 SQL문 출력
 
 logging:
   level:
