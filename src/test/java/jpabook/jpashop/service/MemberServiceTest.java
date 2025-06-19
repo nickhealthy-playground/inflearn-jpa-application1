@@ -2,7 +2,7 @@ package jpabook.jpashop.service;
 
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.repository.MemberRepository;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest
 @Transactional
 @Rollback(value = false)
-class MemberServiceTest {
+public class MemberServiceTest {
 
     @Autowired
     MemberRepository memberRepository;
@@ -37,7 +37,7 @@ class MemberServiceTest {
         assertThat(member).isEqualTo(memberRepository.findOne(saveId));
     }
 
-    @Test
+    @org.junit.Test(expected = IllegalStateException.class)
     @Rollback
     public void 중복_회원_예외() throws Exception {
         //given
@@ -49,11 +49,7 @@ class MemberServiceTest {
 
         //when
         memberService.join(member1);
-        try {
-            memberService.join(member2);
-        } catch (IllegalStateException e) {
-            return;
-        }
+        memberService.join(member2);
 
         //then
         fail("예외 발생");
