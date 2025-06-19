@@ -41,7 +41,7 @@ public class Order {
 
     // == 연관관계 편의 메서드 ==
     public void setMember(Member member) {
-        this.setMember(member);
+        this.member = member;
         member.getOrders().add(this);
     }
 
@@ -51,7 +51,7 @@ public class Order {
     }
 
     public void setDelivery(Delivery delivery) {
-        this.setDelivery(delivery);
+        this.delivery = delivery;
         delivery.setOrder(this);
     }
 
