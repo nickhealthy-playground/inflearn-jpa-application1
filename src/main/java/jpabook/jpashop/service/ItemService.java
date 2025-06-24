@@ -31,10 +31,14 @@ public class ItemService {
      *   병합시 값이 없으면 `null` 로 업데이트 할 위험도 있다. (병합은 모든 필드를 교체한다.)</b>
      */
     @Transactional
-    public void updateItem(Item item) { // 파라미터로 넘어온 준영속 엔티티
+    public void updateItem(Long id, String name, int price, int stockQuantity) { // 파라미터로 넘어온 준영속 엔티티
         // 같은 엔티티를 조회(persistItem 변수는 em.find()로 찾아온 변수이기 때문에 영속 대상)
-        Item persistItem = itemRepository.findOne(item.getId());
-        persistItem.setPrice(item.getPrice()); // 데이터 수정 및 UPDATE 쿼리 발생
+        Item persistItem = itemRepository.findOne(id);
+
+        // 데이터 수정 및 UPDATE 쿼리 발생
+        persistItem.setName(name);
+        persistItem.setPrice(price);
+        persistItem.setStockQuantity(stockQuantity);
     }
 
     public List<Item> findItems() {
