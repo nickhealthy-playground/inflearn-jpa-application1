@@ -20,7 +20,7 @@ public class ItemRepository {
         if (item.getId() == null) {
             em.persist(item);
         } else {
-            em.merge(item) // 여기서 return 값은 영속 엔티티로 merge 이후 영속성 컨텍스트를 사용하려면 반환 값을 이용해야함
+            em.merge(item); // 여기서 return 값은 영속 엔티티로 merge 이후 영속성 컨텍스트를 사용하려면 반환 값을 이용해야함
         }
     }
 
