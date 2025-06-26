@@ -15,6 +15,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 컬렉션 조회 최적화
+ * xToMany(@OneToMany)
+ * Order -> OrderItem
+ */
 @RestController
 @RequiredArgsConstructor
 public class OrderApiController {
@@ -52,6 +57,37 @@ public class OrderApiController {
     @GetMapping("/api/v2/orders")
     public List<OrderDto> ordersV2() {
         List<Order> orders = orderRepository.findAllByString(new OrderSearch());
+        List<OrderDto> result = orders.stream().map(OrderDto::new)
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
+    /**
+     * V3. 엔티티를 조회해서 DTO로 변환(fetch join 사용O)
+     */
+    @GetMapping("/api/v3/orders")
+    public List<OrderDto> ordersV3() {
+
+        /*
+         * [findAllWithItem() 설명]
+         * 1. 패치 조인으로 SQL 한번 실행
+         * 2. 일대다 컬렉션 조회 시 distinct 사용 필요(하이버네이트5버전 -> spring 3.x, hibernate6 버전 이상은 중복 자동 제거)
+         * - 일대다 관계에서 DB는 데이터 양이 증가하므로 distinct 키워드를 통해 중복을 제거함
+         * - 하지만 JPA에서 발생한 쿼리는 실제 DB에선 중복 제거가 이뤄지지 않음
+         * - JPA에서 PK(아래에선 Order 엔티티 PK)가 중복되는 값(엔티티)을 지우고 조회됨
+         * 3. <중요!>: 일대다 컬렉션 조회에서 페이징 처리 불가능.
+         * - 페이징 처리 시 모든 데이터를 읽어와 애플리케이션 임시 메모리에 적재 후 페이징 처리를 시도함
+         * - 또한 데이터 정합성도 맞지 않을 가능성 있음
+         * 4. 일대다 컬렉션 조회 시 다중 컬렉션 조회 X
+         * - 이미 일대다 관계 조인으로 인해 데이터가 증가하였는데, 다른 N개의 데이터가 폭발적으로 증가하게 됨. -> 데이터 정합성 깨질 위험 높음
+         */
+        List<Order> orders = orderRepository.findAllWithItem();
+
+        for (Order order : orders) {
+            System.out.println("order ref= " + order + ", id: " + order.getId());
+        }
+
         List<OrderDto> result = orders.stream().map(OrderDto::new)
                 .collect(Collectors.toList());
 
