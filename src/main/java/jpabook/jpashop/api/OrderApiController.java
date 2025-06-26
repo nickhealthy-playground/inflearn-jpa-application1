@@ -73,6 +73,9 @@ public class OrderApiController {
             this.orderDate = order.getOrderDate();
             this.orderStatus = order.getStatus();
             this.address = order.getDelivery().getAddress();
+
+            // 전송할 데이터와 엔티티는 확실히 구분해야 한다.
+            // 여기서는 order.getOrderItems() 메서드를 호출하면 OrderItem 엔티티가 반환되므로 별도의 DTO를 만들어서 필요한 데이터만 추출한다.
             this.orderItems = order.getOrderItems().stream()
                     .map(OrderItemDto::new)
                     .collect(Collectors.toList());
