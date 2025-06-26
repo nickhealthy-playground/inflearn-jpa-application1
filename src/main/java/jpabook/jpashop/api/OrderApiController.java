@@ -1,14 +1,19 @@
 package jpabook.jpashop.api;
 
+import jpabook.jpashop.domain.Address;
 import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderItem;
+import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,5 +39,57 @@ public class OrderApiController {
         }
 
         return all;
+    }
+
+    /**
+     * V2. 엔티티를 DTO로 변환(fetch join 사용 X)
+     * 지연 로딩으로 너무 많은 SQL 발생(N + 1)
+     *   - order 쿼리 한번 조회 시 -> rows 2개
+     *   - 각 row 당 N번 조회 -> member(N), delivery(N), orderItem(N)
+     *   - orderItem 컬렉션 조회 -> 2건 조회
+     *     - 각 row 당 N번 조회 -> Item(N)
+     */
+    @GetMapping("/api/v2/orders")
+    public List<OrderDto> ordersV2() {
+        List<Order> orders = orderRepository.findAllByString(new OrderSearch());
+        List<OrderDto> result = orders.stream().map(OrderDto::new)
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
+    @Data
+    static class OrderDto {
+        private final Long orderId;
+        private final String name;
+        private final LocalDateTime orderDate; // 주문시간
+        private final OrderStatus orderStatus;
+        private final Address address;
+        private final List<OrderItemDto> orderItems;
+
+        public OrderDto(Order order) {
+            this.orderId = order.getId();
+            this.name = order.getMember().getUsername();
+            this.orderDate = order.getOrderDate();
+            this.orderStatus = order.getStatus();
+            this.address = order.getDelivery().getAddress();
+            this.orderItems = order.getOrderItems().stream()
+                    .map(OrderItemDto::new)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    @Data
+    static class OrderItemDto {
+
+        private final String itemName; // 상품명
+        private final int orderPrice; // 주문 가격
+        private final int count; // 수량
+
+        public OrderItemDto(OrderItem orderItem) {
+            this.itemName = orderItem.getItem().getName();
+            this.orderPrice = orderItem.getOrderPrice();
+            this.count = orderItem.getCount();
+        }
     }
 }
