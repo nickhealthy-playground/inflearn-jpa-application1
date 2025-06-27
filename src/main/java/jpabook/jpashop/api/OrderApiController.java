@@ -9,6 +9,7 @@ import jpabook.jpashop.repository.OrderSearch;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -93,6 +94,30 @@ public class OrderApiController {
 
         return result;
     }
+
+    /**
+     * V3-1. 엔티티를 조회해서 DTO로 변환(fetch join 사용O) + default_batch_fetch_size 설정(IN 쿼리)
+     * 1. 한계 돌파 방법
+     * - xToOne 관계(다대일)에서는 조인해도 데이터가 증가하지 않으므로 fetch join으로 조회
+     * - xToMany 일대다(컬렉션 조회) 조인에선 데이터가 증가하므로 지연 로딩으로 설정(fetch join 설정X)
+     * - 컬렉션 관계는 hibernate.default_batch_fetch_size, @BatchSize로 최적화(IN 쿼리로 조회하도록 변경)
+     *   - hibernate.default_batch_fetch_size: 글로벌 설정
+     *   - @BatchSize: 개별 최적화
+     * 2. 이렇게 설정하면 페이징 처리도 가능하고, 컬렉션 조회에서도 N + 1 문제와 데이터가 증가되어 중복되는 문제도 해결할 수 있다.
+     * 3. 쿼리 호출 수가 N번 -> 1번
+     */
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> ordersV3_1Paging(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "100") int limit) {
+
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit); // xToOne 관계에서 만든 패치 조인(member, delivery)
+        List<OrderDto> result = orders.stream().map(OrderDto::new)
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
 
     @Data
     static class OrderDto {

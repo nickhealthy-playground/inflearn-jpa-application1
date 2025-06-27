@@ -12,6 +12,7 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+        default_batch_fetch_size: 100 # 컬렉션 조회 최적화 - IN 쿼리
 
 logging:
   level:
