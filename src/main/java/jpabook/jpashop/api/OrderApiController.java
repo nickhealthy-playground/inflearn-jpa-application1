@@ -74,6 +74,21 @@ public class OrderApiController {
         return result;
     }
 
+    /**
+     * OSIV와 성능 최적화
+     * - OSIV는 default 값 true
+     * OSIV - true
+     * - 트래픽이 많은 실시간 서비스에서 사용 X
+     * - 데이터베이스 커넥션을 VIEW, Controller 단까지 가져감
+     * - 장점: 지연로딩 로직 등을 VIEW, Controller 단에 작성 가능
+     * - 단점: 커넥션 부족으로 성능 이슈 발생 가능
+     * OSIV - false
+     * - 트래픽이 많은 실시간 서비스에 적용
+     * - 데이터베이스 커넥션이 트랜잭션 시작-끝 부분만 적용
+     * - 장점: DB 커넥션 성능 최적화
+     * - 단점: 커맨드 - 쿼리 분리 로직을 따로 가져가야함, 즉 지연 로딩 사용 불가
+     *   - 서비스 계층에 로직을 모두 작성 or fetch join 적용(OrderQueryService 클래스 참고)
+     */
 //    @GetMapping("/api/v2.1/orders")
 //    public List<jpabook.jpashop.service.query.OrderDto> ordersV2_1() {
 //        return orderQueryService.disableOsivOrders();
