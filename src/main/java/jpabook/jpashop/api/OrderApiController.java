@@ -11,6 +11,7 @@ import jpabook.jpashop.repository.order.query.OrderItemQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto;
+import jpabook.jpashop.service.query.OrderQueryService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,7 @@ public class OrderApiController {
 
     private final OrderRepository orderRepository;
     private final OrderQueryRepository orderQueryRepository;
+    private final OrderQueryService orderQueryService;
 
     /**
      * V1. 엔티티 직접 노출 - 좋은 방법X
@@ -71,6 +73,11 @@ public class OrderApiController {
 
         return result;
     }
+
+//    @GetMapping("/api/v2.1/orders")
+//    public List<jpabook.jpashop.service.query.OrderDto> ordersV2_1() {
+//        return orderQueryService.disableOsivOrders();
+//    }
 
     /**
      * V3. 엔티티를 조회해서 DTO로 변환(fetch join 사용O)
